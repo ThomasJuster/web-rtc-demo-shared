@@ -1,5 +1,5 @@
 {
-  "name": "@rtc-demo/api",
+  "name": "@web-rtc-demo/shared",
   "version": "1.0.0",
   "description": "",
   "main": "build/index.js",
@@ -10,7 +10,7 @@
   "scripts": {
     "clean": "rm -rf ./build",
     "prebuild": "npm run clean",
-    "build": "tsc",
+    "build": "npx tsc",
     "prepack": "npm run build",
     "postpack": "npm run clean",
     "pack-it": "npm pack && mv ./*.tgz ../.registry/",
