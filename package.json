@@ -10,10 +10,10 @@
   "scripts": {
     "clean": "rm -rf ./build",
     "prebuild": "npm run clean",
-    "build": "npx tsc",
-    "prepack": "npm run build",
-    "postpack": "npm run clean",
+    "build": "tsc",
+    "prepack": "npm ci && npm run build",
     "pack-it": "npm pack && mv ./*.tgz ../.registry/",
+    "postpack-it": "npm run clean",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Thomas Juster <juster.thomas@gmail.com>",
