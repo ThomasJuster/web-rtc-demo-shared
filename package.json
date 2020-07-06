@@ -12,8 +12,7 @@
     "prebuild": "npm run clean",
     "build": "tsc",
     "prepack": "npm ci && npm run build",
-    "pack-it": "npm pack && mv ./*.tgz ../.registry/",
-    "postpack-it": "npm run clean",
+    "postpack": "npm run clean",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Thomas Juster <juster.thomas@gmail.com>",
