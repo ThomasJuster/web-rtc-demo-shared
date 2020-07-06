@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2019",
-    "module": "CommonJS",
+    "module": "esnext",
     "strict": true,
     "importHelpers": true,
     "moduleResolution": "Node",
@@ -10,7 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": "./src",
-    "outDir": "./build",
+    "outDir": "./es",
     "lib": [
       "esnext",
       "dom",

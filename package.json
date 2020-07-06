@@ -4,15 +4,20 @@
   "description": "",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "module": "es/index.js",
   "files": [
-    "build/*"
+    "build/*",
+    "es/*"
   ],
   "scripts": {
-    "clean": "rm -rf ./build",
-    "prebuild": "npm run clean",
-    "build": "tsc",
-    "prepack": "npm ci && npm run build",
-    "postpack": "npm run clean",
+    "clean:node": "rm -rf ./build",
+    "prebuild:node": "npm run clean:node",
+    "build:node": "tsc --project ./tsconfig.json",
+    "clean:esnext": "rm -rf ./es",
+    "prebuild:esnext": "npm run clean:esnext",
+    "build:esnext": "tsc --project ./tsconfig.esnext.json",
+    "prepack": "npm ci && npm run build:node && npm run build:esnext",
+    "postpack": "npm run clean:node && npm run clean:esnext",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Thomas Juster <juster.thomas@gmail.com>",
