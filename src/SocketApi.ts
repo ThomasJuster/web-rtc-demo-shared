@@ -8,14 +8,13 @@ interface SocketApiConfig {
   peerId: string;
 }
 
-type MessageListener<T extends SocketMessage> = (event: CustomEvent<T>) => unknown | Promise<unknown>
+type MessageListener<T extends SocketMessage> = (message: T) => unknown | Promise<unknown>
 
-export class SocketApi extends EventTarget {
+export class SocketApi {
   private websocket: WebSocket
   private keepAliveInterval: number | null
 
   constructor ({ baseUrl, sessionName, peerId }: SocketApiConfig) {
-    super()
     this.keepAliveInterval = null
 
     const pathname = SOCKET_ROUTE
@@ -30,12 +29,29 @@ export class SocketApi extends EventTarget {
     this.websocket.onclose = (): void => {
       if (this.keepAliveInterval) window.clearInterval(this.keepAliveInterval)
     }
+  }
 
-    this.websocket.addEventListener('message', (event) => {
-      const socketMessage = parseSocketMessage(event.data)
-      if (socketMessage.type !== 'keep-alive') {
-        this.dispatchEvent(new CustomEvent(socketMessage.type, { detail: socketMessage }))
-      }
+  public onConnectedPeersId (listener: MessageListener<SocketMessageConnectedPeersId>): void {
+    this.onMessage((message) => {
+      if (message.type === 'connected-peers-id') listener(message)
+    })
+  }
+
+  public onOffer (listener: MessageListener<SocketMessageOffer>): void {
+    this.onMessage((message) => {
+      if (message.type === 'offer') listener(message)
+    })
+  }
+
+  public onAnswer (listener: MessageListener<SocketMessageAnswer>): void {
+    this.onMessage((message) => {
+      if (message.type === 'answer') listener(message)
+    })
+  }
+
+  public onIceCandidate (listener: MessageListener<SocketMessageIceCandidate>): void {
+    this.onMessage((message) => {
+      if (message.type === 'ice-candidate') listener(message)
     })
   }
 
@@ -46,26 +62,11 @@ export class SocketApi extends EventTarget {
   public send (data: SocketMessage): void {
     this.websocket.send(JSON.stringify(data))
   }
-}
 
-export interface SocketApi extends EventTarget {
-  addEventListener(type: string, listener: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void
-  dispatchEvent(event: Event): boolean
-  removeEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: EventListenerOptions | boolean): void;
-  
-  addEventListener (type: SocketMessageConnectedPeersId['type'], listener: MessageListener<SocketMessageConnectedPeersId>): void;
-  removeEventListener (type: SocketMessageConnectedPeersId['type'], listener: MessageListener<SocketMessageConnectedPeersId>): void;
-  dispatchEvent (event: CustomEvent<SocketMessageConnectedPeersId>): void;
-
-  addEventListener (type: SocketMessageOffer['type'], listener: MessageListener<SocketMessageOffer>): void;
-  removeEventListener (type: SocketMessageOffer['type'], listener: MessageListener<SocketMessageOffer>): void;
-  dispatchEvent (event: CustomEvent<SocketMessageOffer>): void;
-
-  addEventListener (type: SocketMessageAnswer['type'], listener: MessageListener<SocketMessageAnswer>): void;
-  removeEventListener (type: SocketMessageAnswer['type'], listener: MessageListener<SocketMessageAnswer>): void;
-  dispatchEvent (event: CustomEvent<SocketMessageAnswer>): void;
-
-  addEventListener (type: SocketMessageIceCandidate['type'], listener: MessageListener<SocketMessageIceCandidate>): void;
-  removeEventListener (type: SocketMessageIceCandidate['type'], listener: MessageListener<SocketMessageIceCandidate>): void;
-  dispatchEvent (event: CustomEvent<SocketMessageIceCandidate>): void;
+  private onMessage (listener: MessageListener<SocketMessage>) {
+    this.websocket.addEventListener('message', (event) => {
+      const socketMessage = parseSocketMessage(event.data)
+      listener(socketMessage)
+    })
+  }
 }
